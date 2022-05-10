@@ -5,7 +5,6 @@ void printResult(Process processes[], int NUM_PROCESSES);
 
 int arrivalTimeComparator(const void *a, const void *b);
 int burstTimeComparator(const void *a, const void *b);
-void sortByArrivalTime(Process process[], int size);
 
 PriorityQueue* createPriorityQueue(int (*comparator)(const void*, const void*));
 void push(PriorityQueue *queue, Process *process);
