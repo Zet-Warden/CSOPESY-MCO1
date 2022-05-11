@@ -29,7 +29,7 @@ getDataFromFile(String filename)
 
     fp = fopen(filename, "r");
     if(fp == NULL) {
-        fprintf(stderr, "<%s> not found.", filename);
+        fprintf(stderr, "%s not found.", filename);
         exit(1);
     }
 
@@ -80,11 +80,11 @@ printResult(Process processes[], int NUM_PROCESSES)
             // one pair of start and end time for brevity
             if(prevTime == NULL || currTime->startTime != prevTime->endTime)
             {
-                printf("Start Time: %d ", currTime->startTime);
+                printf("start time: %d ", currTime->startTime);
             }
 
             if(nextTime == NULL || currTime->endTime != nextTime->startTime) {
-                printf("End Time: %d | ", currTime->endTime);
+                printf("end time: %d | ", currTime->endTime);
             }
         }
 
@@ -93,5 +93,5 @@ printResult(Process processes[], int NUM_PROCESSES)
     }
 
     float avgWaitingTime = totalWaitingTime / NUM_PROCESSES;
-    printf("Average waiting time: %.3f", avgWaitingTime);
+    printf("Average waiting time: %f", avgWaitingTime);
 }

@@ -20,8 +20,9 @@ main()
             break;
         case SJF:
             sjf(data->processes, data->numProcesses);
+            break;
         case SRTF:
-            srtf(data->processes, data->numProcesses, data->timeSlice);
+            srtf(data->processes, data->numProcesses);
             break;
         case RR:
             rr(data->processes, data->numProcesses, data->timeSlice);

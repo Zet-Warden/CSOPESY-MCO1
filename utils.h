@@ -21,5 +21,5 @@ TimeNode* get(TimeList *list, int index);
 void scheduleProcesses(Process processes[], int NUM_PROCESSES, SchedulingOptions *options);
 void fcfs(Process processes[], int NUM_PROCESSES);
 void sjf(Process processes[], int NUM_PROCESSES);
-void srtf(Process processes[], int NUM_PROCESSES, int timeSlice);
+void srtf(Process processes[], int NUM_PROCESSES);
 void rr(Process processes[], int NUM_PROCESSES, int timeSlice);

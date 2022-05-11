@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "types.h"
+#include "utils.h"
 
 /**
  * @brief Create a Priority Queue object
@@ -29,7 +30,7 @@ createPriorityQueue(int (*comparator)(const void*, const void*))
 }
 
 /**
- * @brief Pushes a process into the queue
+ * @brief Pushes a process into the queue; ensures that processes within the queue are only pushed once
  *  
  * @param queue     the address of the queue that takes in the process object 
  * @param process   the address of process object to be inserted into the queue
@@ -37,6 +38,8 @@ createPriorityQueue(int (*comparator)(const void*, const void*))
 void
 push(PriorityQueue *queue, Process *process)
 {
+    if(contains(queue, process)) return;
+
     ProcessNode *currNode = queue->head;
     ProcessNode *prevNode = NULL;
 

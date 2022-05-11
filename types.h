@@ -3,7 +3,7 @@
 typedef char String[255];
 
 enum algo {FCFS, SJF, SRTF, RR};
-enum status {NEW, RUNNING, WAITING, READY, TERMINATED};
+enum status {NEW, RUNNING, INTERRUPTED, READY, TERMINATED};
 enum schedType {NONPREEMPTIVE, PREEMPTIVE};
 
 typedef struct TimeNode {

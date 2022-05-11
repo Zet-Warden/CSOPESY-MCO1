@@ -28,41 +28,11 @@ scheduleProcesses(Process processes[], int NUM_PROCESSES, SchedulingOptions *opt
 
     PriorityQueue *pendingProcesses = createPriorityQueue(options->comparator);
     Process *currProcess = NULL;
+    Process *interruptedProcess = NULL;
      
     while(finishedProcesses < NUM_PROCESSES) {
-        // add all READY processes to the queue if not yet included
-        for(int i = 0; i < NUM_PROCESSES; i++) {
-            if(processes[i].status == NEW && processes[i].arrivalTime <= time) {
-                processes[i].status = READY;
-            }
-
-            if(processes[i].status == READY) {
-                if(!contains(pendingProcesses, &processes[i])) {
-                    push(pendingProcesses, &processes[i]);
-                }
-            }
-        }
-
-        // get the process to be processed next if CPU is free
-        if(currProcess == NULL) {
-            currProcess = pop(pendingProcesses);
-            if(currProcess != NULL) {
-                currProcess->status = RUNNING;
-                currProcess->timeList->tail->startTime = time;
-            }
-        } 
-
-        // increment the waiting time of READY processes
-        for(int i = 0; i < NUM_PROCESSES; i++) {
-            if(processes[i].status == READY) {
-                processes[i].waitingTime++;
-            }
-        }
-       
-        // process job
-        time++;
+        // process current job
         if(currProcess != NULL) {
-            
             // update how long the process has been running
             // throughout its entire life cycle
             currProcess->progress++;
@@ -83,14 +53,52 @@ scheduleProcesses(Process processes[], int NUM_PROCESSES, SchedulingOptions *opt
             else if(options->schedType == PREEMPTIVE && currProcess->progress % options->timeSlice == 0) {
                 currProcess->timeList->tail->endTime = time;
                 currProcess->status = READY;
-
                 // create a record to keep track
                 // of each start and end time in-between slices
                 append(currProcess->timeList, -1, -1);
 
+                interruptedProcess = currProcess;
                 currProcess = NULL;
             }
         }
+
+        // add all READY processes to the queue if not yet included
+        for(int i = 0; i < NUM_PROCESSES; i++) {
+            if(processes[i].status == NEW && processes[i].arrivalTime <= time) {
+                processes[i].status = READY;
+            }
+
+            // READY processes that were not interupted take priority
+            if(processes[i].status == READY &&
+                (interruptedProcess == NULL || processes[i].pid != interruptedProcess->pid)) {
+                push(pendingProcesses, &processes[i]);
+            }
+        }
+
+        // push previously interrupted process (if any) back to the queue
+        if(interruptedProcess != NULL) {
+            push(pendingProcesses, interruptedProcess);
+            interruptedProcess = NULL;
+        }
+
+        // get the process to be processed next if CPU is free
+        if(currProcess == NULL) {
+            currProcess = pop(pendingProcesses);
+            if(currProcess != NULL) {
+                currProcess->status = RUNNING;
+                currProcess->timeList->tail->startTime = time;
+            }
+        } 
+
+        // increment the waiting time of READY processes
+        // as they are not currently running
+        for(int i = 0; i < NUM_PROCESSES; i++) {
+            if(processes[i].status == READY) {
+                processes[i].waitingTime++;
+            }
+        }
+       
+        time++;
     }
 }
 
@@ -131,15 +139,14 @@ sjf(Process processes[], int NUM_PROCESSES)
  * 
  * @param processes     the processed to be scheduled, will be mutated based on the results of the SRTF algorithm
  * @param NUM_PROCESSES the number of processes
- * @param timeSlice     time slice/time quantum
  */
 void 
-srtf(Process processes[], int NUM_PROCESSES, int timeSlice)
+srtf(Process processes[], int NUM_PROCESSES)
 {
     SchedulingOptions *options = (SchedulingOptions*)malloc(sizeof(SchedulingOptions));
     options->schedType = PREEMPTIVE;
     options->comparator = burstTimeComparator;
-    options->timeSlice = timeSlice;
+    options->timeSlice = 1;
     scheduleProcesses(processes, NUM_PROCESSES, options);
 }
 
@@ -156,6 +163,6 @@ rr(Process processes[], int NUM_PROCESSES, int timeSlice)
     SchedulingOptions *options = (SchedulingOptions*)malloc(sizeof(SchedulingOptions));
     options->schedType = PREEMPTIVE;
     options->comparator = NULL;
-    options->timeSlice = 1;
+    options->timeSlice = timeSlice;
     scheduleProcesses(processes, NUM_PROCESSES, options);
 }
